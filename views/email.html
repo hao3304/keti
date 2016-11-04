@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>通用查询系统</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/stylesheets/font-awesome.min.css?__inline">
+    <!-- Bootstrap core CSS -->
+    <link href="/stylesheets/bootstrap.min.css?__inline" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="/stylesheets/mdb.min.css?__inline" rel="stylesheet">
+    <!-- Your custom styles (optional) -->
+    <link href="/stylesheets/style.css?__inline" rel="stylesheet">
+    <style>
+        @media (min-width: 768px) {
+            #form-inline{
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body id="app">
+
+<nav class="navbar navbar-fixed-top  navbar-dark  scrolling-navbar secondary-color-dark">
+
+    <div class="container">
+        <!--Navbar Brand-->
+        <!--Links-->
+        <ul class="nav navbar-nav">
+            <li class="nav-item waves-effect waves-light" v-for="t in tabs" :class="{active:t.v == active}">
+                <a class="nav-link waves-effect waves-light"  :href="'./'+t.url" @click="active = t.v" >{{t.n}}</a>
+            </li>
+        </ul>
+
+        <ul class="nav navbar-nav pull-right">
+            <li class="nav-item  waves-effect waves-light">
+                <a class="nav-link waves-effect waves-light" href="#"><span class="fa fa-user"></span>                Admin
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<main class="p-t-5 container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+
+                    <form class="form-inline" style="margin:0 auto" id="form-inline">
+
+                        <div class="md-form form-group">
+                            <i class="fa fa-envelope prefix"></i>
+                            <input type="text" id="form91" v-model="email" class="form-control validate">
+                            <label for="form91" >请输入Email地址</label>
+                        </div>
+
+                        <div class="md-form form-group">
+                            <a href="javascript:;" @click="onQuery" class="btn btn-primary btn-lg">查询
+
+                                <div class="preloader-wrapper small active" v-show="loading" style="width: 20px;height: 20px;">
+                                    <div class="spinner-layer spinner-yellow-only">
+                                        <div class="circle-clipper left">
+                                            <div class="circle"></div>
+                                        </div><div class="gap-patch">
+                                        <div class="circle"></div>
+                                    </div><div class="circle-clipper right">
+                                        <div class="circle"></div>
+                                    </div>
+                                    </div>
+                                </div>
+
+                            </a>
+                            <a href="javascript:;" @click="onReset" class="btn btn-warning btn-lg">重置</a>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="card-block row" >
+
+                    <div class=" col-md-12 card-block"  >
+                            <h4 class="card-title">收件箱</h4>
+
+                            <div class=" table-responsive  ">
+                                <table class="table table-condensed">
+                                    <thead class="thead-default">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>邮件ID</th>
+                                        <th>对方地址</th>
+                                        <th>对方IP</th>
+                                        <th>发送时间</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-for="d in data.receive">
+                                        <td>
+                                            {{$index+1}}
+                                        </td>
+                                        <td>
+                                            {{d._fields[0]}}
+                                        </td>
+                                        <td>
+                                            {{d._fields[1]}}
+                                        </td>
+                                        <td>
+                                            {{d._fields[2].properties.sendIp}}
+                                        </td>
+                                        <td>
+                                            {{d._fields[2].properties.sendTime}}
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                    </div>
+                    <div class=" col-md-12 card-block" >
+                            <h4 class="card-title">发件箱</h4>
+
+                            <div class=" table-responsive  ">
+                                <table class="table table-condensed">
+                                    <thead class="thead-default">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>邮件ID</th>
+                                        <th>发送地址</th>
+                                        <th>发送IP</th>
+                                        <th>发送时间</th>
+                                        <th>目标IP</th>
+                                        <th>目标接收时间</th>
+                                        <th>状态</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-for="d in data.send">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{d._fields[0]}}</td>
+                                        <td>{{d._fields[1]}}</td>
+                                        <td>{{d._fields[2].properties.sendIp}}</td>
+                                        <td>{{d._fields[2].properties.sendTime}}</td>
+                                        <td>{{d._fields[2].properties.receiveIp}}</td>
+                                        <td>{{d._fields[2].properties.receiveTime}}</td>
+                                        <td>{{d._fields[2].properties.status}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+</main>
+<!-- SCRIPTS -->
+
+<!-- JQuery -->
+<script type="text/javascript" src="./javascripts/jquery-2.2.3.min.js?__inline"></script>
+
+<!-- Bootstrap tooltips -->
+<script type="text/javascript" src="./javascripts/tether.min.js?__inline"></script>
+
+<!-- Bootstrap core JavaScript -->
+<script type="text/javascript" src="./javascripts/bootstrap.min.js?__inline"></script>
+
+<!-- MDB core JavaScript -->
+<script type="text/javascript" src="./javascripts/mdb.min.js?__inline"></script>
+
+<script type="text/javascript" src="./javascripts/vue.js?__inline"></script>
+
+<script>
+
+    new Vue({
+        el:'#app',
+        data:{
+            tabs:[
+                {
+                    v:0,
+                    n:'邮件查询',
+                    url:'email'
+                }
+            ],
+            active:0,
+            email:'liaojiajia@sjtu.edu.cn',
+            loading:false,
+            data:{
+                send:[],
+                receive:[]
+            }
+        },
+        methods:{
+            renderTimePicker:function () {
+
+                var config = {
+                    weekdaysShort:['日','一','二','三','四','五','六'],
+                    weekdaysFull:['星期日','星期一','星期二','星期三','星期四','星期五','星期六'],
+                    monthsFull:['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'],
+                    monthsShort:['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'],
+                    today:'今日',
+                    clear:'清除',
+                    close:'关闭',
+                    format: 'yyyy-mm-dd'
+                };
+
+                $('#startTime').pickadate(config);
+                $('#endTime').pickadate(config);
+            },
+            onQuery:function () {
+                var self = this;
+
+                if(!this.email||this.loading){
+                    return;
+                }
+                this.loading = true;
+                $.get('/email/'+this.email,{},function (rep) {
+                    self.data = rep;
+                    self.loading = false;
+                },"json")
+            },
+            onReset:function () {
+                var $form =  $('#form-inline');
+                $form.find('.active').removeClass('active');
+                $form.find('.valid').removeClass('valid');
+                this.email = '';
+                this.data.send = [];
+                this.data.receive = [];
+            }
+        },
+        ready:function () {
+            this.renderTimePicker();
+        }
+    })
+
+</script>
+
+
+
+</body>
+
+</html>
