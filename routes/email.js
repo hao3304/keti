@@ -10,11 +10,15 @@ router.get('/',function *(next) {
 })
 
 router.get('/:address', function *(next) {
+    var start = new Date().getTime();
+    console.log(start);
     var address = this.params.address;
     if(address){
         var send = yield session.run("MATCH (n)-[r:SEND]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:RECEIVE]-(w) return t.messageid as Id,w.address as Address,r as Ship", {address:address})
         var receive = yield session.run("MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) return t.messageid as Id,w.address as Address,r as Ship", {address:address})
-        this.body = {send:send.records,receive:receive.records}
+        var end = new Date().getTime();
+        console.log(end);
+        this.body = {send:send.records,receive:receive.records,time:end - start}
     }else{
         this.body = [];
     }

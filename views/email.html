@@ -10,11 +10,7 @@
     <title>通用查询系统</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="/stylesheets/font-awesome.min.css?__inline">
-    <!-- Bootstrap core CSS -->
     <link href="/stylesheets/bootstrap.min.css?__inline" rel="stylesheet">
-    <!-- Material Design Bootstrap -->
-    <link href="/stylesheets/mdb.min.css?__inline" rel="stylesheet">
-    <!-- Your custom styles (optional) -->
     <link href="/stylesheets/style.css?__inline" rel="stylesheet">
     <style>
         @media (min-width: 768px) {
@@ -26,76 +22,61 @@
 </head>
 
 <body id="app">
+<nav class="navbar navbar-inverse" role="navigation">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">通用查询系统</a>
+        </div>
 
-<nav class="navbar navbar-fixed-top  navbar-dark  scrolling-navbar secondary-color-dark">
-
-    <div class="container">
-        <!--Navbar Brand-->
-        <!--Links-->
-        <ul class="nav navbar-nav">
-            <li class="nav-item waves-effect waves-light" v-for="t in tabs" :class="{active:t.v == active}">
-                <a class="nav-link waves-effect waves-light"  :href="'./'+t.url" @click="active = t.v" >{{t.n}}</a>
-            </li>
-        </ul>
-
-        <ul class="nav navbar-nav pull-right">
-            <li class="nav-item  waves-effect waves-light">
-                <a class="nav-link waves-effect waves-light" href="#"><span class="fa fa-user"></span>                Admin
-                </a>
-            </li>
-        </ul>
-    </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li  v-for="t in tabs" :class="{active:t.v == active}"><a :href="'./'+t.url" @click="active = t.v" >{{t.n}}</a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
 </nav>
-<main class="p-t-5 container-fluid">
+
+<section class="container-fluid">
     <div class="row">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
 
-                    <form class="form-inline" style="margin:0 auto" id="form-inline">
-
-                        <div class="md-form form-group">
-                            <i class="fa fa-envelope prefix"></i>
-                            <input type="text" id="form91" v-model="email" class="form-control validate">
-                            <label for="form91" >请输入Email地址</label>
+                    <form class="form-inline" role="form" style="text-align: center">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" class="form-control" v-model="email" placeholder="请输入邮箱名称">
+                                <span class="input-group-addon">{{shift}}</span>
+                            </div>
                         </div>
-
-                        <div class="md-form form-group">
-                            <a href="javascript:;" @click="onQuery" class="btn btn-primary btn-lg">查询
-
-                                <div class="preloader-wrapper small active" v-show="loading" style="width: 20px;height: 20px;">
-                                    <div class="spinner-layer spinner-yellow-only">
-                                        <div class="circle-clipper left">
-                                            <div class="circle"></div>
-                                        </div><div class="gap-patch">
-                                        <div class="circle"></div>
-                                    </div><div class="circle-clipper right">
-                                        <div class="circle"></div>
-                                    </div>
-                                    </div>
-                                </div>
-
-                            </a>
-                            <a href="javascript:;" @click="onReset" class="btn btn-warning btn-lg">重置</a>
-                        </div>
-
+                        <a href="javascript:;" class="btn btn-primary" @click="onQuery">查询</a>
+                        <a href="javascript:;" @click="onReset" class="btn btn-warning ">重置</a>
+                        <span v-show="data.time">查询耗时:{{data.time}}毫秒</span>
                     </form>
                 </div>
+                <hr>
 
-                <div class="card-block row" >
-
-                    <div class=" col-md-12 card-block"  >
-                            <h4 class="card-title">收件箱</h4>
-
+                <div class=" row" >
+                    <div class=" col-md-6"  >
+                            <h5 >收件箱</h5>
                             <div class=" table-responsive  ">
-                                <table class="table table-condensed">
+                                <table class="table table-bordered table-striped table-condensed">
                                     <thead class="thead-default">
                                     <tr>
                                         <th>#</th>
-                                        <th>邮件ID</th>
+                                        <!--<th>邮件ID</th>-->
                                         <th>对方地址</th>
-                                        <th>对方IP</th>
+                                        <!--<th>对方IP</th>-->
                                         <th>发送时间</th>
+                                        <th>操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -103,50 +84,52 @@
                                         <td>
                                             {{$index+1}}
                                         </td>
-                                        <td>
-                                            {{d._fields[0]}}
-                                        </td>
+                                        <!--<td>-->
+                                            <!--{{d._fields[0]}}-->
+                                        <!--</td>-->
                                         <td>
                                             {{d._fields[1]}}
                                         </td>
-                                        <td>
-                                            {{d._fields[2].properties.sendIp}}
-                                        </td>
+                                        <!--<td>-->
+                                            <!--{{d._fields[2].properties.sendIp}}-->
+                                        <!--</td>-->
                                         <td>
                                             {{d._fields[2].properties.sendTime}}
                                         </td>
+                                        <td><a href="javascript:;" @click="showModal(d,'receive')">查看详情</a></td>
                                     </tr>
                                     </tbody>
                                 </table>
                             </div>
                     </div>
-                    <div class=" col-md-12 card-block" >
-                            <h4 class="card-title">发件箱</h4>
-
+                    <div class=" col-md-6 " >
+                        <h5 >发件箱</h5>
                             <div class=" table-responsive  ">
-                                <table class="table table-condensed">
+                                <table class="table table-condensed table-striped table-bordered">
                                     <thead class="thead-default">
                                     <tr>
                                         <th>#</th>
-                                        <th>邮件ID</th>
+                                        <!--<th>邮件ID</th>-->
                                         <th>发送地址</th>
-                                        <th>发送IP</th>
+                                        <!--<th>发送IP</th>-->
                                         <th>发送时间</th>
-                                        <th>目标IP</th>
-                                        <th>目标接收时间</th>
-                                        <th>状态</th>
+                                        <!--<th>目标IP</th>-->
+                                        <!--<th>接收时间</th>-->
+                                        <!--<th>状态</th>-->
+                                        <th>操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <tr v-for="d in data.send">
                                         <td>{{$index+1}}</td>
-                                        <td>{{d._fields[0]}}</td>
+                                        <!--<td>{{d._fields[0]}}</td>-->
                                         <td>{{d._fields[1]}}</td>
-                                        <td>{{d._fields[2].properties.sendIp}}</td>
+                                        <!--<td>{{d._fields[2].properties.sendIp}}</td>-->
                                         <td>{{d._fields[2].properties.sendTime}}</td>
-                                        <td>{{d._fields[2].properties.receiveIp}}</td>
-                                        <td>{{d._fields[2].properties.receiveTime}}</td>
-                                        <td>{{d._fields[2].properties.status}}</td>
+                                        <!--<td>{{d._fields[2].properties.receiveIp}}</td>-->
+                                        <!--<td>{{d._fields[2].properties.receiveTime}}</td>-->
+                                        <!--<td>{{d._fields[2].properties.status}}</td>-->
+                                        <td><a href="javascript:;" @click="showModal(d,'send')">查看详情</a></td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -154,26 +137,79 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
-
     </div>
 
-</main>
+    <div id="modal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" >详情</h4>
+                </div>
+                <table class="table" v-show="type=='receive'">
+                    <tr>
+                        <td>邮件ID</td>
+                        <td>{{detail._fields[0]}}</td>
+                    </tr>
+                    <tr>
+                        <td>对方地址</td>
+                        <td>{{detail._fields[1]}}</td>
+                    </tr>
+                    <tr>
+                        <td>对方IP</td>
+                        <td>{{detail._fields[2].properties.sendIp}}</td>
+                    </tr>
+                    <tr>
+                        <td>发送时间</td>
+                        <td>{{detail._fields[2].properties.sendTime}}</td>
+                    </tr>
+                </table>
+                <table class="table" v-show="type=='send'">
+                    <tr>
+                        <td style="width: 100px">邮件ID</td>
+                        <td>{{detail._fields[0]}}</td>
+                    </tr>
+                    <tr>
+                        <td>对方地址</td>
+                        <td>{{detail._fields[1]}}</td>
+                    </tr>
+                    <tr>
+                        <td>发送IP</td>
+                        <td>{{detail._fields[2].properties.sendIp}}</td>
+                    </tr>
+                    <tr>
+                        <td>发送时间</td>
+                        <td>{{detail._fields[2].properties.sendTime}}</td>
+                    </tr>
+                    <tr>
+                        <td>目标IP</td>
+                        <td>{{detail._fields[2].properties.receiveIp}}</td>
+                    </tr>
+                    <tr>
+                        <td>接收时间</td>
+                        <td>{{detail._fields[2].properties.receiveTime}}</td>
+                    </tr>
+                    <tr>
+                        <td>状态</td>
+                        <td>{{detail._fields[2].properties.status}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+</section>
+
 <!-- SCRIPTS -->
 
 <!-- JQuery -->
 <script type="text/javascript" src="./javascripts/jquery-2.2.3.min.js?__inline"></script>
-
 <!-- Bootstrap tooltips -->
 <script type="text/javascript" src="./javascripts/tether.min.js?__inline"></script>
-
 <!-- Bootstrap core JavaScript -->
 <script type="text/javascript" src="./javascripts/bootstrap.min.js?__inline"></script>
-
-<!-- MDB core JavaScript -->
-<script type="text/javascript" src="./javascripts/mdb.min.js?__inline"></script>
 
 <script type="text/javascript" src="./javascripts/vue.js?__inline"></script>
 
@@ -189,13 +225,17 @@
                     url:'email'
                 }
             ],
+            shift:'@sjtu.edu.cn',
             active:0,
-            email:'liaojiajia@sjtu.edu.cn',
+            email:'liaojiajia',
             loading:false,
             data:{
                 send:[],
-                receive:[]
-            }
+                receive:[],
+                time:''
+            },
+            detail:{},
+            type:'send'
         },
         methods:{
             renderTimePicker:function () {
@@ -221,7 +261,7 @@
                     return;
                 }
                 this.loading = true;
-                $.get('/email/'+this.email,{},function (rep) {
+                $.get('/email/'+this.email+this.shift,{},function (rep) {
                     self.data = rep;
                     self.loading = false;
                 },"json")
@@ -233,10 +273,14 @@
                 this.email = '';
                 this.data.send = [];
                 this.data.receive = [];
+            },
+            showModal:function (detail,type) {
+                this.detail = detail;
+                this.type = type;
+                $('#modal').modal('show');
             }
         },
         ready:function () {
-            this.renderTimePicker();
         }
     })
 
