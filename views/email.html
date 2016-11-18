@@ -22,7 +22,7 @@
 </head>
 
 <body id="app">
-<nav class="navbar navbar-inverse" role="navigation">
+<nav class="navbar navbar-inverse" role="navigation" style="border-radius: 0;">
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
@@ -54,7 +54,7 @@
                         <div class="form-group">
                             <div class="input-group">
                                 <input type="text" class="form-control" v-model="email" placeholder="请输入邮箱名称">
-                                <span class="input-group-addon">{{shift}}</span>
+                                <span class="input-group-addon" v-text="shift"></span>
                             </div>
                         </div>
                         <a href="javascript:;" class="btn btn-primary" @click="onQuery">查询</a>
@@ -147,7 +147,7 @@
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
                     <h4 class="modal-title" >详情</h4>
                 </div>
-                <table class="table" v-show="type=='receive'">
+                <table  style="width: 100%" class="table" v-show="type=='receive'">
                     <tr>
                         <td>邮件ID</td>
                         <td>{{detail._fields[0]}}</td>
@@ -165,7 +165,7 @@
                         <td>{{detail._fields[2].properties.sendTime}}</td>
                     </tr>
                 </table>
-                <table class="table" v-show="type=='send'">
+                <table style="width: 100%" class="table" v-show="type=='send'">
                     <tr>
                         <td style="width: 100px">邮件ID</td>
                         <td>{{detail._fields[0]}}</td>
