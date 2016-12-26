@@ -62,85 +62,91 @@
                     </form>
                 </div>
                 <hr>
-                <ul class="nav nav-tabs" v-show="data.send.length>0||data.receive.length>0">
-                    <li role="presentation" :class="{'active':tab==0}" @click="tab=0"><a href="javascript:;">收件箱</a></li>
-                    <li role="presentation" :class="{'active':tab==1}" @click="tab=1"><a href="javascript:;">发件箱</a></li>
+                <ul class="nav nav-tabs">
+                    <li role="presentation" :class="{'active':type=='receive'}" @click="type='receive'"><a href="javascript:;">收件箱</a></li>
+                    <li role="presentation" :class="{'active':type=='send'}" @click="type='send'"><a href="javascript:;">发件箱</a></li>
                 </ul>
-                <div class=" row" v-show="data.send.length>0||data.receive.length>0">
-                    <div class=" col-md-12" v-show="tab==0" >
+                <div class=" row">
+                    <div class=" col-md-12" v-show="type=='receive'" >
                         <h5 >查询结果</h5>
-                            <div class=" table-responsive  ">
-                                <table class="table table-bordered table-striped table-condensed">
-                                    <thead class="thead-default">
-                                    <tr>
-                                        <th>#</th>
-                                        <!--<th>邮件ID</th>-->
-                                        <th>对方地址</th>
-                                        <!--<th>对方IP</th>-->
-                                        <th>对方发送时间</th>
-                                        <th>邮件大小</th>
-                                        <th>操作</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr v-for="d in data.receive">
-                                        <td>
-                                            {{$index+1}}
-                                        </td>
-                                        <!--<td>-->
-                                            <!--{{d._fields[0]}}-->
-                                        <!--</td>-->
-                                        <td>
-                                            {{d._fields[1]}}
-                                        </td>
-                                        <!--<td>-->
-                                            <!--{{d._fields[2].properties.sendIp}}-->
-                                        <!--</td>-->
-                                        <td>
-                                            {{d._fields[2].properties.sendTimeStamp | time}}
-                                        </td>
+                        <div class=" table-responsive  ">
+                            <table class="table table-bordered table-striped table-condensed">
+                                <thead class="thead-default">
+                                <tr>
+                                    <th>#</th>
+                                    <!--<th>邮件ID</th>-->
+                                    <th>对方地址</th>
+                                    <!--<th>对方IP</th>-->
+                                    <th>对方发送时间</th>
+                                    <th>邮件大小</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="d in data.receive">
+                                    <td>
+                                        {{$index+ 1 + receiveParams.page*20}}
+                                    </td>
+                                    <!--<td>-->
+                                    <!--{{d._fields[0]}}-->
+                                    <!--</td>-->
+                                    <td>
+                                        {{d._fields[1]}}
+                                    </td>
+                                    <!--<td>-->
+                                    <!--{{d._fields[2].properties.sendIp}}-->
+                                    <!--</td>-->
+                                    <td>
+                                        {{d._fields[2].properties.sendTimeStamp | time}}
+                                    </td>
 
-                                        <td>{{(d._fields[2].properties.size.low/1024).toFixed(2)}}KB</td>
-                                        <td><a href="javascript:;" @click="showModal(d,'receive')">查看详情</a></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                                    <td>{{(d._fields[2].properties.size.low/1024).toFixed(2)}}KB</td>
+                                    <td><a href="javascript:;" @click="showModal(d,'receive')">查看详情</a></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <nav>
+                                <ul class="pager">
+                                    <li class="previous" :class="{'disabled':receiveParams.page<=0}"><a href="javascript:;"  @click="onPrev">&larr; 上一页</a></li>
+                                    <li class="next"  :class="{'disabled':data.receive.length<20}"><a href="javascript:;" @click="onNext"  >下一页 &rarr;</a></li>
+                                </ul>
+                            </nav>
+                        </div>
                     </div>
-                    <div class=" col-md-12 " v-show="tab==1" >
+                    <div class=" col-md-12 " v-show="type=='send'" >
                         <h5 >查询结果</h5>
-                            <div class=" table-responsive  ">
-                                <table class="table table-condensed table-striped table-bordered">
-                                    <thead class="thead-default">
-                                    <tr>
-                                        <th>#</th>
-                                        <!--<th>邮件ID</th>-->
-                                        <th>发送地址</th>
-                                        <!--<th>发送IP</th>-->
-                                        <th>发送时间</th>
-                                        <!--<th>目标IP</th>-->
-                                        <!--<th>接收时间</th>-->
-                                        <!--<th>状态</th>-->
-                                        <th>邮件大小</th>
-                                        <th>操作</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr v-for="d in data.send">
-                                        <td>{{$index+1}}</td>
-                                        <!--<td>{{d._fields[0]}}</td>-->
-                                        <td>{{d._fields[1]}}</td>
-                                        <!--<td>{{d._fields[2].properties.sendIp}}</td>-->
-                                        <td>{{d._fields[2].properties.sendTimeStamp | time}}</td>
-                                        <td>{{(d._fields[2].properties.size.low/1024).toFixed(2)}}KB</td>
-                                        <!--<td>{{d._fields[2].properties.receiveIp}}</td>-->
-                                        <!--<td>{{d._fields[2].properties.receiveTime}}</td>-->
-                                        <!--<td>{{d._fields[2].properties.status}}</td>-->
-                                        <td><a href="javascript:;" @click="showModal(d,'send')">查看详情</a></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                        <div class=" table-responsive  ">
+                            <table class="table table-condensed table-striped table-bordered">
+                                <thead class="thead-default">
+                                <tr>
+                                    <th>#</th>
+                                    <!--<th>邮件ID</th>-->
+                                    <th>发送地址</th>
+                                    <!--<th>发送IP</th>-->
+                                    <th>发送时间</th>
+                                    <!--<th>目标IP</th>-->
+                                    <!--<th>接收时间</th>-->
+                                    <!--<th>状态</th>-->
+                                    <th>邮件大小</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="d in data.send">
+                                    <td>{{$index+1 + sendParams.page*20}}</td>
+                                    <!--<td>{{d._fields[0]}}</td>-->
+                                    <td>{{d._fields[1]}}</td>
+                                    <!--<td>{{d._fields[2].properties.sendIp}}</td>-->
+                                    <td>{{d._fields[2].properties.sendTimeStamp | time}}</td>
+                                    <td>{{(d._fields[2].properties.size.low/1024).toFixed(2)}}KB</td>
+                                    <!--<td>{{d._fields[2].properties.receiveIp}}</td>-->
+                                    <!--<td>{{d._fields[2].properties.receiveTime}}</td>-->
+                                    <!--<td>{{d._fields[2].properties.status}}</td>-->
+                                    <td><a href="javascript:;" @click="showModal(d,'send')">查看详情</a></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -264,8 +270,17 @@
                 receive:[],
                 time:''
             },
+            sendParams:{
+                page:0,
+                total:0
+            },
+            receiveParams:{
+                page:0,
+                total:0
+            },
+            size:20,
             detail:{},
-            type:'send'
+            type:'receive'
         },
         methods:{
             renderTimePicker:function () {
@@ -286,14 +301,20 @@
             },
             onQuery:function () {
                 var self = this;
-
                 if(!this.email||this.loading){
                     return;
                 }
                 this.loading = true;
                 layer.load();
-                $.get('/email/'+this.email+this.shift,{},function (rep) {
-                    self.data = rep;
+                var self = this;
+                $.get('/email/'+this.email+this.shift+'/'+this.type +'/'+ (this.type=='send'?this.sendParams.page:this.receiveParams.page),{},function (rep) {
+                    if(self.type =='send'){
+                        self.data.send = rep.send;
+                    }else{
+                        self.data.receive = rep.receive;
+                    }
+//                    self.sendParams.total = rep.total.records[0]._fields[0].low;
+                    self.data.time = rep.time;
                     self.loading = false;
                     layer.closeAll();
                 },"json");
@@ -312,6 +333,43 @@
                 this.detail = detail;
                 this.type = type;
                 $('#modal').modal('show');
+            },
+            onPrev:function () {
+                if(this.type == 'receive'){
+                    if(this.receiveParams.page >0){
+                        this.receiveParams.page --;
+                    }
+                }else{
+                    if(this.sendParams.page>0){
+                        this.sendParams.page --;
+                    }
+                }
+            },
+            onNext:function () {
+                if(this.type == 'receive'){
+                    if(this.data.receive.length ==20){
+                        this.receiveParams.page ++;
+                    }
+                }else{
+                    if(this.data.send.length == 20){
+                        this.sendParams.page ++;
+                    }
+                }
+            }
+        },
+        watch:{
+            'type':function (t) {
+                if(this.data[t].length==0){
+                    this.onQuery();
+                }
+            },
+            'sendParams.page':function () {
+                this.data.send = [];
+                this.onQuery();
+            },
+            'receiveParams.page':function () {
+                this.data.receive = [];
+                this.onQuery();
             }
         },
         ready:function () {

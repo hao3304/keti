@@ -9,14 +9,26 @@ router.get('/',function *(next) {
     yield this.render('email');
 })
 
-router.get('/:address', function *(next) {
-    var start = new Date().getTime();
-    var address = this.params.address;
+router.get('/:address/:type/:page', function *(next) {
+    let start = new Date().getTime();
+    let address = this.params.address;
+    let page = this.params.page;
+    let type = this.params.type;
+
+    if(type == 'send'){
+        let send = yield session.run("MATCH (n)-[r:SEND]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:RECEIVE]-(w) WITH t.messageid as Id,w.address as Address,r as Ship Order By Id return Id,Address,Ship SKIP {page} LIMIT 20 ", {address:address,page:parseInt(page*20)});
+        // let count = yield session.run("MATCH (n)-[r:SEND]-(t:Emessage) Where n.address = {address}  WITH t MATCH (t)-[r:RECEIVE]-(w) return count(*) as total",{address:address});
+        let end = new Date().getTime();
+        this.body = {send:trans(send.records),time:end - start}
+    }else{
+        let receive = yield session.run("MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) WITH t.messageid as Id,w.address as Address,r as Ship Order By Id return Id,Address,Ship  SKIP {page} LIMIT 20", {address:address,page:parseInt(page*20)})
+        // let count = yield session.run("MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) return count(*) as total",{address:address});
+        let end = new Date().getTime();
+        this.body = {receive:trans(receive.records),time:end - start}
+    }
+
     if(address){
-        var send = yield session.run("MATCH (n)-[r:SEND]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:RECEIVE]-(w) return t.messageid as Id,w.address as Address,r as Ship", {address:address})
-        var receive = yield session.run("MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) return t.messageid as Id,w.address as Address,r as Ship", {address:address})
-        var end = new Date().getTime();
-        this.body = {send:trans(send.records),receive:trans(receive.records),time:end - start}
+
     }else{
         this.body = [];
     }
