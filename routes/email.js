@@ -16,12 +16,12 @@ router.get('/:address/:type/:page', function *(next) {
     let type = this.params.type;
 
     if(type == 'send'){
-        let send = yield session.run("MATCH (n)-[r:SEND]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:RECEIVE]-(w) WITH t.messageid as Id,w.address as Address,r as Ship Order By Id return Id,Address,Ship SKIP {page} LIMIT 20 ", {address:address,page:parseInt(page*20)});
+        let send = yield session.run("MATCH (n)-[r:SEND]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:RECEIVE]-(w) WITH t.messageid as Id,w.address as Address,r as Ship  return Id,Address,Ship SKIP {page} LIMIT 20 ", {address:address,page:parseInt(page*20)});
         // let count = yield session.run("MATCH (n)-[r:SEND]-(t:Emessage) Where n.address = {address}  WITH t MATCH (t)-[r:RECEIVE]-(w) return count(*) as total",{address:address});
         let end = new Date().getTime();
         this.body = {send:trans(send.records),time:end - start}
     }else{
-        let receive = yield session.run("MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) WITH t.messageid as Id,w.address as Address,r as Ship Order By Id return Id,Address,Ship  SKIP {page} LIMIT 20", {address:address,page:parseInt(page*20)})
+        let receive = yield session.run("MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) WITH t.messageid as Id,w.address as Address,r as Ship return Id,Address,Ship  SKIP {page} LIMIT 20", {address:address,page:parseInt(page*20)})
         // let count = yield session.run("MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) return count(*) as total",{address:address});
         let end = new Date().getTime();
         this.body = {receive:trans(receive.records),time:end - start}
