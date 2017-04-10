@@ -7,7 +7,28 @@ const session = require('../db');
 
 router.get('/',function *(next) {
     yield this.render('email');
-})
+});
+
+router.get('/data',function *(next) {
+
+    let query = this.query;
+    let email = query.email;
+    let action = query.action;
+    let page = parseInt(query.page || 0);
+    let search = `MATCH p=()-[r:POP3]->(s) where s.address = "${email}" and r.action = "${action}" `;
+
+    if(query['date[]'] && query['date[]'].length>0){
+        let begin = query['date[]'][0],
+            end = query['date[]'][1];
+        search += ` and r.timestamp >= "${begin}" and r.timestamp <= "${end}" `;
+    }
+
+    let count = yield session.run(search + 'return count(*) as count');
+    search += 'return p   order by r.timestamp DESC';
+
+    let data = yield session.run( search + " SKIP {page} LIMIT 20 ", {page:parseInt((page-1)*20)});
+    this.body = {total:count,data:data.records || []};
+});
 
 router.get('/:address/:type/:page', function *(next) {
     let start = new Date().getTime();
@@ -21,7 +42,8 @@ router.get('/:address/:type/:page', function *(next) {
         let end = new Date().getTime();
         this.body = {send:trans(send.records),time:end - start}
     }else{
-        let receive = yield session.run("MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) WITH t.messageid as Id,w.address as Address,r as Ship return Id,Address,Ship  SKIP {page} LIMIT 20", {address:address,page:parseInt(page*20)})
+        // let receive = yield session.run("MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) WITH t.messageid as Id,w.address as Address,r as Ship return Id,Address,Ship  SKIP {page} LIMIT 20", {address:address,page:parseInt(page*20)})
+        let receive = yield session.run("MATCH (n:IPAddress) RETURN n LIMIT 25");
         // let count = yield session.run("MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) return count(*) as total",{address:address});
         let end = new Date().getTime();
         this.body = {receive:trans(receive.records),time:end - start}
@@ -55,7 +77,7 @@ function tranTime(time) {
     var tstr = time.replace('  ',' ');
     tstr = tstr.split(' ');
     if(tstr.length == 3){
-         tstr.splice(2,0,2016);
+        tstr.splice(2,0,2016);
         return Date.parse(new Date(tstr.join(' ')));
     }else{
         return Date.parse(time);
