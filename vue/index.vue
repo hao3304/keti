@@ -1,65 +1,76 @@
 <template>
-    <div>
-        <header>
-            通用查询系统
-        </header>
-        <section>
-            <div class="toolbar">
-                <el-form :model='form' ref='form' :inline="true" :rules='rules' class="demo-form-inline">
-                    <el-form-item label="目标邮箱" prop='email'>
-                        <el-input placeholder="请输入目标邮箱地址" v-model='form.email'></el-input>
-                    </el-form-item>
-                    <el-form-item label="操作行为">
-                        <el-select placeholder="请选择操作行为" v-model='form.action'>
-                            <el-option label="DELE" value="DELE"></el-option>
-                            <el-option label="LOGIN" value="LOGIN"></el-option>
-                            <el-option label="RETR" value="RETR"></el-option>
-                            <el-option label="FETCH" value="FETCH"></el-option>
-                            <el-option label="Adding" value="Adding"></el-option>
-                            <el-option label="EXPUNGE" value="EXPUNGE"></el-option>
-                            <el-option label="SendMsgRequest" value="SendMsgRequest"></el-option>
-                        </el-select>
-                    </el-form-item >
-                    <el-form-item label="日期范围" v-model='form.date' >
-                        <el-date-picker
-                                v-model='form.date'
-                                type="daterange"
-                                placeholder="选择日期范围">
-                        </el-date-picker>
-                    </el-form-item>
-                    <el-form-item>
-                    <el-button type="primary" @click='onSearch' icon='search' >查询</el-button>
-                </el-form-item>
-                </el-form>
-            </div>
-            <el-table
-                    :data='data'
-                    :height="height"
-                    v-loading.body="loading"
-                    element-loading-text="拼命加载中"
-            >
-                <el-table-column label='地址（address）' prop='address'>
-                </el-table-column>
-                <el-table-column label='操作行为（action）'  prop='action'>
-                </el-table-column>
-                <el-table-column label='系统IP（systemIp）'  prop='systemIp'>
-                </el-table-column>
-                <el-table-column label='操作时间（timestamp）'  inline-template >
-                    <span>{{new Date(row.timestamp*1000).Format('yyyy-MM-dd hh:ss')}}</span>
-                </el-table-column>
-            </el-table>
-            <div style="text-align:right;margin-top:5px;">
-                <el-pagination
+        <el-row style='height:100%;'>
+            <el-col :span="4" style='height:100%;background-color:#eef1f6'>
+                <el-menu default-active="/" :router='true' class="el-menu-vertical-demo">
+                    <el-menu-item index="/"><i class="el-icon-menu"></i>访问记录</el-menu-item>
+                    <el-menu-item index="/email"><i class="el-icon-setting"></i>邮件传递记录</el-menu-item>
+                </el-menu>
+            </el-col>
+            <el-col :span="20" style='padding:10px;'>
+                <div class="toolbar">
+                    <el-form :model='form' ref='form' :inline="true" :rules='rules' class="demo-form-inline">
+                        <el-form-item label="目标邮箱" prop='email'>
+                            <el-input placeholder="请输入邮箱地址" style='width:240px;' v-model='form.email'>
+                                <template slot="append">{{prefix}}</template>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="操作行为">
+                            <el-select placeholder="请选择操作行为" v-model='form.action'>
+                                <el-option label="DELE" value="DELE"></el-option>
+                                <el-option label="LOGIN" value="LOGIN"></el-option>
+                                <el-option label="RETR" value="RETR"></el-option>
+                                <el-option label="FETCH" value="FETCH"></el-option>
+                                <el-option label="Adding" value="Adding"></el-option>
+                                <el-option label="EXPUNGE" value="EXPUNGE"></el-option>
+                                <el-option label="SendMsgRequest" value="SendMsgRequest"></el-option>
+                            </el-select>
+                        </el-form-item >
+                        <el-form-item label="日期范围" v-model='form.date' >
+                            <el-date-picker
+                                    v-model='form.date'
+                                    type="daterange"
+                                    placeholder="选择日期范围">
+                            </el-date-picker>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click='onSearch' icon='search' >查询</el-button>
+                            <!--<el-button  @click='onReset'  >重置</el-button>-->
+                        </el-form-item>
+                    </el-form>
+                </div>
+                <el-table
+                        :data='data'
+                        :height="height"
+                        v-loading.body="loading"
+                        element-loading-text="拼命加载中"
+                >
+                    <el-table-column type='index' label='#' width='60'>
+                        <template scope='scope'>
+                            <span>{{scope.$index + 1 + (form.page - 1)*form.size}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label='地址（address）' prop='address'>
+                    </el-table-column>
+                    <el-table-column label='操作行为（action）'  prop='action'>
+                    </el-table-column>
+                    <el-table-column label='系统IP（systemIp）'  prop='systemIp'>
+                    </el-table-column>
+                    <el-table-column label='操作时间（timestamp）'  inline-template >
+                        <span>{{new Date(row.timestamp*1000).Format('yyyy-MM-dd hh:ss')}}</span>
+                    </el-table-column>
+                </el-table>
+                <div style="text-align:right;margin-top:5px;">
+                    <el-pagination
 
-                        @current-change="handleCurrentChange"
-                        :current-page="form.page"
-                        :page-size="20"
-                        layout="total, prev, pager, next"
-                        :total="total">
-                </el-pagination>
-            </div>
-        </section>
-    </div>
+                            @current-change="handleCurrentChange"
+                            :current-page="form.page"
+                            :page-size="20"
+                            layout="total, prev, pager, next"
+                            :total="total">
+                    </el-pagination>
+                </div>
+            </el-col>
+        </el-row>
 </template>
 <style lang='less'>
     body,html{
@@ -69,7 +80,7 @@
     }
     header{
         height:60px;
-        background-color: #0099cc;
+        background-color: #324157;
         position: fixed;
         top:0;
         left: 0;
@@ -82,18 +93,27 @@
     }
 
     section{
-        padding:60px 10px 0 10px;
+        position: absolute;
+        top:60px;
+        bottom: 0;
+        left: 0;
+        width: 100%;
         .toolbar{
             padding-top: 10px;
         }
+    }
+
+    .el-menu-item.is-active{
+        background-color: #9ddde5;
     }
 </style>
 <script>
     export default{
         data(){
             return{
+                prefix:'@sjtu.edu.cn',
                 form: {
-                    email:'liu-wei@sjtu.edu.cn',
+                    email:'qizhwei',
                     date:[],
                     action:'DELE',
                     page:1,
@@ -105,7 +125,7 @@
                     ]
                 },
                 data:[],
-                height:document.documentElement.clientHeight - 200,
+                height:document.documentElement.clientHeight - 190,
                 total:0,
                 loading:false
             }
@@ -121,6 +141,13 @@
                     }
                 })
             },
+            onReset(){
+                this.form.email = '';
+                this.form.date = [];
+                this.form.action = 'DELE';
+                this.form.page = 1;
+                this.data = [];
+            },
             transData(data) {
                 return data.map(d=>{
                     let obj = d._fields[0].segments[0];
@@ -135,7 +162,9 @@
             },
             getData() {
                 this.loading = true;
-                let query = $.extend(JSON.parse(JSON.stringify(this.form)),{date:this.getDate(this.form.date)})
+                let params = JSON.parse(JSON.stringify(this.form));
+                params.email += this.prefix;
+                let query = $.extend(params,{date:this.getDate(this.form.date)})
                 $.get('/email/data',query,rep=> {
                     this.total = rep.total.records[0]._fields[0].low;
                     this.data = this.transData(rep.data);
@@ -156,21 +185,7 @@
             }
         },
         mounted(){
-            Date.prototype.Format = function (fmt) { //author: meizz
-                var o = {
-                    "M+": this.getMonth() + 1, //月份
-                    "d+": this.getDate(), //日
-                    "h+": this.getHours(), //小时
-                    "m+": this.getMinutes(), //分
-                    "s+": this.getSeconds(), //秒
-                    "q+": Math.floor((this.getMonth() + 3) / 3), //季度
-                    "S": this.getMilliseconds() //毫秒
-                };
-                if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-                for (var k in o)
-                    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-                return fmt;
-            }
+
         }
     }
 </script>

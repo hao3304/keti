@@ -35,18 +35,32 @@ router.get('/:address/:type/:page', function *(next) {
     let address = this.params.address;
     let page = this.params.page;
     let type = this.params.type;
+    let query = this.query;
 
     if(type == 'send'){
-        let send = yield session.run("MATCH (n)-[r:SEND]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:RECEIVE]-(w) WITH t.messageid as Id,w.address as Address,r as Ship  return Id,Address,Ship SKIP {page} LIMIT 20 ", {address:address,page:parseInt(page*20)});
-        // let count = yield session.run("MATCH (n)-[r:SEND]-(t:Emessage) Where n.address = {address}  WITH t MATCH (t)-[r:RECEIVE]-(w) return count(*) as total",{address:address});
-        let end = new Date().getTime();
-        this.body = {send:trans(send.records),time:end - start}
+        let search = "MATCH (n)-[r:SEND]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:RECEIVE]-(w) WITH t.messageid as Id,w.address as Address,r as Ship ";
+
+        if(query['date[]'] && query['date[]'].length>0){
+            let begin = query['date[]'][0],
+                end = query['date[]'][1];
+            search += ` where Ship.sendTime >= "${begin}" and Ship.sendTime <= "${end}" `;
+        }
+
+        let send = yield session.run(search + " return Id,Address,Ship order by Ship.sendTime DESC SKIP {page} LIMIT 20 ", {address:address,page:parseInt(page-1)*20});
+        let count = yield session.run( search +" return count(*) as total",{address:address});
+        this.body = {data:send.records,total:count}
     }else{
-        // let receive = yield session.run("MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) WITH t.messageid as Id,w.address as Address,r as Ship return Id,Address,Ship  SKIP {page} LIMIT 20", {address:address,page:parseInt(page*20)})
-        let receive = yield session.run("MATCH (n:IPAddress) RETURN n LIMIT 25");
-        // let count = yield session.run("MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) return count(*) as total",{address:address});
-        let end = new Date().getTime();
-        this.body = {receive:trans(receive.records),time:end - start}
+        let search = "MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) WITH t.messageid as Id,w.address as Address,r as Ship ";
+
+        if(query['date[]'] && query['date[]'].length>0){
+            let begin = query['date[]'][0],
+                end = query['date[]'][1];
+            search += ` where Ship.sendTime >= "${begin}" and Ship.sendTime <= "${end}" `;
+        }
+
+        let receive = yield session.run(search + "return Id,Address,Ship order by Ship.sendTime DESC  SKIP {page} LIMIT 20", {address:address,page:parseInt(page-1)*20})
+        let count = yield session.run( search +" return count(*) as total",{address:address});
+        this.body = {data:receive.records,total:count}
     }
 
     if(address){
