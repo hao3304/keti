@@ -22,11 +22,9 @@ router.get('/data',function *(next) {
             end = query['date[]'][1];
         search += ` and r.timestamp >= "${begin}" and r.timestamp <= "${end}" `;
     }
-
-    let count = yield session.run(search + 'return count(*) as count');
+    let count = yield session.db46.run(search + 'return count(*) as count');
     search += 'return p   order by r.timestamp DESC';
-
-    let data = yield session.run( search + " SKIP {page} LIMIT 20 ", {page:parseInt((page-1)*20)});
+    let data = yield session.db46.run( search + " SKIP {page} LIMIT 20 ", {page:parseInt((page-1)*20)});
     this.body = {total:count,data:data.records || []};
 });
 
@@ -46,8 +44,8 @@ router.get('/:address/:type/:page', function *(next) {
             search += ` where Ship.sendTime >= "${begin}" and Ship.sendTime <= "${end}" `;
         }
 
-        let send = yield session.run(search + " return Id,Address,Ship order by Ship.sendTime DESC SKIP {page} LIMIT 20 ", {address:address,page:parseInt(page-1)*20});
-        let count = yield session.run( search +" return count(*) as total",{address:address});
+        let send = yield session.db47.run(search + " return Id,Address,Ship order by Ship.sendTime DESC SKIP {page} LIMIT 20 ", {address:address,page:parseInt(page-1)*20});
+        let count = yield session.db47.run( search +" return count(*) as total",{address:address});
         this.body = {data:send.records,total:count}
     }else{
         let search = "MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) WITH t.messageid as Id,w.address as Address,r as Ship ";
@@ -58,8 +56,8 @@ router.get('/:address/:type/:page', function *(next) {
             search += ` where Ship.sendTime >= "${begin}" and Ship.sendTime <= "${end}" `;
         }
 
-        let receive = yield session.run(search + "return Id,Address,Ship order by Ship.sendTime DESC  SKIP {page} LIMIT 20", {address:address,page:parseInt(page-1)*20})
-        let count = yield session.run( search +" return count(*) as total",{address:address});
+        let receive = yield session.db47.run(search + "return Id,Address,Ship order by Ship.sendTime DESC  SKIP {page} LIMIT 20", {address:address,page:parseInt(page-1)*20})
+        let count = yield session.db47.run( search +" return count(*) as total",{address:address});
         this.body = {data:receive.records,total:count}
     }
 
