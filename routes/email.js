@@ -36,7 +36,7 @@ router.get('/:address/:type/:page', function *(next) {
     let query = this.query;
 
     if(type == 'send'){
-        let search = "MATCH (n)-[r:SEND]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:RECEIVE]-(w) WITH t.messageid as Id,w.address as Address,r as Ship ";
+        let search = "MATCH (n:EmailAddress)-[r:SEND]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:RECEIVE]-(w) WITH t.messageid as Id,w.address as Address,r as Ship ";
 
         if(query['date[]'] && query['date[]'].length>0){
             let begin = query['date[]'][0],
@@ -48,7 +48,7 @@ router.get('/:address/:type/:page', function *(next) {
         let count = yield session.db47.run( search +" return count(*) as total",{address:address});
         this.body = {data:send.records,total:count}
     }else{
-        let search = "MATCH (n)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) WITH t.messageid as Id,w.address as Address,r as Ship ";
+        let search = "MATCH (n:EmailAddress)-[r:RECEIVE]-(t:Emessage) Where n.address = {address} WITH t MATCH (t)-[r:SEND]-(w) WITH t.messageid as Id,w.address as Address,r as Ship ";
 
         if(query['date[]'] && query['date[]'].length>0){
             let begin = query['date[]'][0],
