@@ -20,7 +20,7 @@ def getByTime():
     start = request.args.get("start")
     end = request.args.get("end")
     page = request.args.get("page") or 1
-    skip = limit * (page - 1)
+    skip = limit * (int(page.encode("utf-8")) - 1)
     if(start == None or end == None or start == "" or end == ""):
         return Response(status=400)
     else:
@@ -63,7 +63,7 @@ def getByIp():
     start = request.args.get("start")
     end = request.args.get("end")
     page = request.args.get("page") or 1
-    skip = limit * (page - 1)
+    skip = limit * (int(page.encode("utf-8")) - 1)
     if(ip == None or ip == ""):
         return Response(status=400)
     else:
