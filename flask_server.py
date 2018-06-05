@@ -10,7 +10,7 @@ import json
 app = Flask(__name__)
 host = "202.121.178.254"
 hostL = "0.0.0.0"
-port = 8000
+port = 83
 mongoClient = MongoClient("202.121.179.53")
 logTable = mongoClient["logMessage"]["message"]
 # at most $limit records matched are returned
