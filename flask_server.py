@@ -35,7 +35,7 @@ def getByFromAddr():
     start = request.args.get("start")
     end = request.args.get("end")
     page = request.args.get("page") or 1
-    skip = limit * (page - 1)
+    skip = limit * (int(page.encode("utf-8")) - 1)
     results = None
     if((fromAddr == None or fromAddr == "") and (toAddr == None or toAddr == "")):
         return Response(status=400)
