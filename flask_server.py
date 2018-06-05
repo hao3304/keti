@@ -74,5 +74,5 @@ def getByIp():
         serializeRes = json.dumps(list(results), separators=(',',':'), sort_keys=True, default=str)
         return jsonify(result=serializeRes)
 if __name__ == "__main__":
-  http_server = WSGIServer((host, port), app)
+  http_server = WSGIServer((hostL, port), app)
   http_server.serve_forever()
