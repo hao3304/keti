@@ -8,7 +8,7 @@ from pymongo import MongoClient
 import json
 
 app = Flask(__name__)
-host = "202.121.179.51"
+host = "202.121.178.254"
 hostL = "0.0.0.0"
 port = 8000
 mongoClient = MongoClient("202.121.179.53")
